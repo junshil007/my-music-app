@@ -8,7 +8,7 @@
 import { ref, reactive, computed } from "vue";
 import { defineStore } from "pinia";
 import { getPlayListDetail } from "@/api/index";
-import { formatTopSongs, formatSongs } from "@/utils/song";
+import { formatTopSongs } from "@/utils/song";
 import { search } from "@/api/index";
 
 export interface ISong {
@@ -50,8 +50,6 @@ export const useSongStore = defineStore("song", () => {
     let { code, playlist } = await getPlayListDetail(id);
     if (code === 200 && Array.isArray(playlist.trackIds)) {
       Object.assign(songList, { ...formatTopSongs(playlist.tracks) });
-      console.log("getSongList", formatTopSongs(playlist.tracks));
-
       loading.value = false;
     } else {
       new Error("获取歌单详情失败");
@@ -62,9 +60,15 @@ export const useSongStore = defineStore("song", () => {
 
   /** 搜索歌曲 */
   async function getSearchList(params: any) {
+    loading.value = true;
     let { result, code } = await search(params);
     if (code === 200) {
       Object.assign(songList, { ...formatTopSongs(result.songs) });
+      loading.value = false;
+    } else {
+      new Error("获取歌单详情失败");
+      loading.value = false;
+      return;
     }
   }
 

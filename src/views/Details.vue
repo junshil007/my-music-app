@@ -9,12 +9,14 @@
 import MusicList from "@/components/MusicList.vue";
 import { onMounted, ref } from "vue";
 import { useSongStore } from "@/stores/song";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 
 const route = useRoute();
-const loading = ref<boolean>(false);
 
 const { getSongList, songList } = useSongStore();
+const { loading } = storeToRefs(useSongStore());
+
 onMounted(() => {
   const id = route.params.id as string;
   getSongList(id);

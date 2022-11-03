@@ -9,8 +9,10 @@
 import { useRouter, useRoute } from "vue-router";
 import { ref, reactive, watch } from "vue";
 
-import { storeToRefs } from "pinia";
 import SongInfo from "@/components/SongInfo.vue";
+import MenuTab from "@/components/MenuTab.vue";
+
+import { storeToRefs } from "pinia";
 import { useSongStore } from "@/stores/song";
 import { useLyricStore } from "@/stores/lyric";
 
@@ -185,14 +187,7 @@ watch(
     <div class="music-container">
       <div class="list-main">
         <div class="menu-box">
-          <div
-            :class="`menu-button${state.activeIndex === index ? ' active' : ''}`"
-            v-for="(item, index) in state.menuList"
-            :key="index"
-            @click="ChangeActive(index)"
-          >
-            <span class="bnt"> {{ item }}</span>
-          </div>
+          <MenuTab></MenuTab>
         </div>
         <div class="main-container">
           <!-- <router-view v-slot="{ Component }">
@@ -309,108 +304,6 @@ watch(
       width: calc(~"100% - 320px");
       height: 100%;
 
-      .menu-box {
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        height: 60px;
-        align-items: center;
-        padding-left: 24px;
-        box-sizing: border-box;
-        overflow: hidden;
-
-        .menu-button {
-          width: 96px;
-          border: 1px solid #dddcdc;
-          height: 36px;
-          text-align: center;
-          color: #dddcdc;
-          line-height: 35px;
-          font-size: 15px;
-          margin-right: 20px;
-          cursor: pointer;
-          border-radius: 3px;
-          box-sizing: border-box;
-          position: relative;
-          overflow: hidden;
-
-          &:hover {
-            border-color: @vue_color;
-            color: @vue_color;
-            box-shadow: 1px 1px 8px 2px @vue_color_option;
-          }
-
-          &:before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(120deg, transparent, @vue_color_option, transparent);
-            transition: all 650ms;
-          }
-
-          &:hover:before {
-            left: 100%;
-          }
-
-          &.active {
-            --border-width: 2px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            line-height: 36px;
-            // width: 300px;
-            // height: 200px;
-            font-family: Lato, sans-serif;
-            // font-size: 2.5rem;
-            text-transform: uppercase;
-            color: white;
-            border-color: white;
-            background: rgba(235, 227, 227, 0.6);
-            border-radius: var(--border-width);
-            box-shadow: none;
-
-            &::before {
-              display: none;
-            }
-
-            &::after {
-              position: absolute;
-              content: "";
-              top: calc(-1 * var(--border-width));
-              left: calc(-1 * var(--border-width));
-              z-index: -1;
-              width: calc(100% + var(--border-width) * 2);
-              height: calc(100% + var(--border-width) * 2);
-              background: linear-gradient(
-                60deg,
-                hsl(224, 85%, 66%),
-                hsl(269, 85%, 66%),
-                hsl(314, 85%, 66%),
-                hsl(359, 85%, 66%),
-                hsl(44, 85%, 66%),
-                hsl(89, 85%, 66%),
-                hsl(134, 85%, 66%),
-                hsl(179, 85%, 66%)
-              );
-              background-size: 300% 300%;
-              background-position: 0 50%;
-              border-radius: calc(2 * var(--border-width));
-              animation: moveGradient 4s alternate infinite;
-            }
-          }
-
-          @keyframes moveGradient {
-            50% {
-              background-position: 100% 50%;
-            }
-          }
-        }
-      }
-
       .main-container {
         width: 100%;
         box-sizing: border-box;
@@ -418,6 +311,19 @@ watch(
         height: calc(~"100% - 60px");
         position: relative;
         overflow: auto;
+      }
+      .list-main {
+        width: calc(~"100% - 320px");
+        height: 100%;
+
+        .main-container {
+          width: 100%;
+          box-sizing: border-box;
+          padding-left: 24px;
+          height: calc(~"100% - 60px");
+          position: relative;
+          overflow: auto;
+        }
       }
     }
 

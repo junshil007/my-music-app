@@ -12,6 +12,7 @@ import { formatTopSongs, Song } from "@/utils/song";
 import MusicList from "@/components/MusicList.vue";
 import type { ISong } from "@/stores/song";
 import { useSongStore } from "@/stores/song";
+import { storeToRefs } from "pinia";
 
 const state = reactive({
   Artists: [] as { first: string }[], // 热搜数组
@@ -20,6 +21,8 @@ const state = reactive({
   page: 0, // 分页
   limit: 30, // 默认查询长度
 });
+
+const { loading } = storeToRefs(useSongStore());
 
 const clickHot = (name: string) => {
   state.searchValue = name;
@@ -54,7 +57,7 @@ onMounted(() => {
 
 <template>
   <!--搜索-->
-  <div class="search">
+  <div class="search" v-loading.fullscreen.lock="loading" element-loading-background="rgba(0, 0, 0, 0.4)">
     <div class="search-head">
       <span v-for="(item, index) in state.Artists" :key="index" @click="clickHot(item.first)">
         {{ item.first }}
