@@ -78,16 +78,14 @@ function getDuration() {
 const timeupdate = (e: any) => {
   let compareTime = e.target.currentTime;
   for (let i = 0; i < lyricInfo.length; i++) {
-    if (compareTime > parseInt(lyricInfo[i].time)) {
+    if (compareTime > lyricInfo[i].time) {
       const index = lyricInfo[i].index;
-      if (i === parseInt(index)) {
+      if (i === index) {
         state.lyricIndex = i;
       }
     }
   }
   state.currentTime = compareTime;
-  // state.audioProgress = compareTime / audio.value.duration;
-  // state.thumbTranslateX = (state.audioProgress * state.progressL).toFixed(3);
 };
 
 /**
@@ -110,15 +108,6 @@ const palyEnded = () => {
 /**
  * 控制播放按钮
  */
-function controlPlay() {
-  onChangePlay(!isPlay.value);
-  if (!audio.value.paused) {
-    audio.value.pause();
-  } else {
-    audio.value.play();
-  }
-}
-
 function play() {
   onChangePlay(true);
 }
@@ -209,8 +198,8 @@ watch(
       </div>
       <div class="play-icon-container">
         <img class="play-icon" src="../assets/arrow_01.png" @click="onChangeSong('last')" alt="上一曲" />
-        <img v-show="!isPlay" @click="controlPlay" class="play-icon" src="../assets/play_01.png" alt="播放" />
-        <img v-show="isPlay" @click="controlPlay" class="play-icon" src="../assets/play_02.png" alt="暂停" />
+        <img v-show="!isPlay" @click="play" class="play-icon" src="../assets/play_01.png" alt="播放" />
+        <img v-show="isPlay" @click="pause" class="play-icon" src="../assets/play_02.png" alt="暂停" />
         <img class="play-icon" src="../assets/arrow_02.png" @click="onChangeSong('next')" alt="下一曲" />
       </div>
       <div class="music-speed">
