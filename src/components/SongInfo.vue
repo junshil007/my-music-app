@@ -2,16 +2,11 @@
 import { computed, nextTick, onMounted, reactive, ref, watchEffect } from "vue";
 import { useSongStore } from "@/stores/song";
 import { useLyricStore } from "@/stores/lyric";
+import { storeToRefs } from "pinia";
 
 interface Props {
   nolyric?: boolean;
   lyricIndex: number;
-}
-
-interface ILyric {
-  index: number;
-  lyric: string;
-  time: number;
 }
 
 const LyricStyle = reactive({
@@ -30,7 +25,7 @@ const LyricStyle = reactive({
 });
 
 const props = defineProps<Props>();
-const { song } = useSongStore();
+const { song } = storeToRefs(useSongStore());
 const { lyricInfo } = useLyricStore();
 
 const top = ref<number>(0);
@@ -59,13 +54,6 @@ const clacTop = () => {
     console.log(dom.clientHeight);
     LyricStyle.paddingTop = dom.clientHeight / 2 - LyricStyle.lineHeight;
   }
-
-  // const { display = "" } = window.getComputedStyle(dom);
-  // if (display === "none") {
-  //   return;
-  // }
-  // const height = dom.offsetHeight;
-  // top.value = Math.floor(height / 34 / 2);
 };
 </script>
 

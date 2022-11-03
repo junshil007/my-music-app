@@ -3,14 +3,14 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-18
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-11-02
+ * @LastEditTime: 2022-11-03
 -->
 <script setup lang="ts">
-import { onMounted, ref, reactive, computed, toRefs, watch, watchEffect, nextTick } from "vue";
-
 import { useRouter, useRoute } from "vue-router";
-import SongInfo from "@/components/SongInfo.vue";
+import { ref, reactive, watch } from "vue";
+
 import { storeToRefs } from "pinia";
+import SongInfo from "@/components/SongInfo.vue";
 import { useSongStore } from "@/stores/song";
 import { useLyricStore } from "@/stores/lyric";
 
@@ -22,26 +22,7 @@ const state = reactive({
   mentRouter: ["playlist", "toplist", "search", "historylist"],
   /**当前分类*/
   activeIndex: 0,
-  songList: [
-    {
-      albumId: 122397809,
-      albumTitle: "一些古风歌【2021】",
-      artistsName: "平生不晚",
-      cover: "https://p2.music.126.net/pOR45DW9BfLSQ2JDJJeUgQ==/109951165714496390.jpg",
-      id: 1820643403,
-      name: "伯虎说（纯戏腔段）",
-      url: "https://music.163.com/song/media/outer/url?id=1820643403.mp3",
-    },
-    {
-      albumId: 75612550,
-      albumTitle: "辞.九门回忆",
-      artistsName: "解忧草/冰幽",
-      cover: "https://p1.music.126.net/pWJXXU4kbhsk1HhXCPUMag==/109951163879149420.jpg",
-      id: 557640761,
-      name: "辞.九门回忆",
-      url: "https://music.163.com/song/media/outer/url?id=1347524822.mp3",
-    },
-  ],
+  songList: [],
   audioProgress: 0, // 进度
   playType: 1, // 播放类型，1:列表循环  2：随机播放 3：单曲循环
   playIndex: 0, // 当前播放哪一首
@@ -54,27 +35,10 @@ const state = reactive({
   volume: 80,
   playStatus: false, // 搜索或者历史播放完成后关闭播放状态按钮
 });
-
-let track = ref(null);
 const audio = ref();
-
-const audioProgressPercent = computed(() => {
-  return `${state.audioProgress * 100}%`;
-});
-
-const { song, onChangeSong, onPlaying } = useSongStore();
-const { playing } = storeToRefs(useSongStore());
+const { song, isPlay } = storeToRefs(useSongStore());
+const { onChangeSong, onChangePlay } = useSongStore();
 const { lyricInfo } = useLyricStore();
-
-onMounted(() => {
-  console.log(state.progressL); //取元素宽高等属性操作
-  let bar = document.getElementById("audio-bar");
-  if (bar) {
-    state.progressL = bar.offsetWidth;
-  } else {
-    console.log("error is bar not find", bar);
-  }
-});
 
 const ChangeActive = async (index: number) => {
   state.activeIndex = index;
@@ -105,10 +69,6 @@ const TimeToString = (seconds: string) => {
 function getDuration() {
   state.endTime = audio.value.duration;
 }
-// const getDuration = () => {
-//   console.log(audio?.value?.duration, "audio?.value?.duration");
-//   state.endTime = TimeToString(audio?.value?.duration) || "00:00";
-// };
 
 /**
  *  当前播放时间
@@ -133,8 +93,6 @@ const timeupdate = (e: any) => {
  * @param value 当前的值
  */
 function changeCurrentTime(value: number) {
-  console.log(value, "value", parseInt(value));
-
   audio.value.currentTime = parseInt(value);
   state.currentTime = value;
 }
@@ -148,36 +106,10 @@ const palyEnded = () => {
 };
 
 /**
- * 播放暂停  同时更新播放状态
- */
-const playMusic = () => {
-  // if (playing.value) {
-  //   audio.value?.load();
-  //   nextTick(() => {
-  //     audio.value?.play();
-  //   });
-  // } else {
-  //   audio.value?.pause();
-  // }
-  state.isPlay = !state.isPlay;
-  if (!audio.value.paused) {
-    audio.value.pause();
-  } else {
-    audio.value.load();
-    audio.value.play();
-  }
-};
-
-function audioPlay() {
-  audio.value.play();
-  state.isPlay = true;
-}
-
-/**
  * 控制播放按钮
  */
 function controlPlay() {
-  state.isPlay = !state.isPlay;
+  onChangePlay(!isPlay.value);
   if (!audio.value.paused) {
     audio.value.pause();
   } else {
@@ -186,22 +118,44 @@ function controlPlay() {
 }
 
 function play() {
-  state.isPlay = true;
+  onChangePlay(true);
 }
 function pause() {
-  state.isPlay = false;
+  onChangePlay(false);
 }
 
 /**
- * 暂停歌曲&切换歌曲
+ * 监听歌曲源变化
  */
 watch(
-  () => song,
-  (newValue, oldValue) => {
-    playMusic();
-  },
-  {
-    deep: true,
+  () => song.value.url,
+  (newValue) => {
+    audio.value.load();
+    var playPromise = audio.value.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then((_: any) => {
+          play();
+        })
+        .catch((error: any) => {
+          audio.value.load();
+          // play();
+          console.log(error);
+        });
+    }
+  }
+);
+/**
+ * 监听播放开启变化
+ */
+watch(
+  () => isPlay.value,
+  (newValue) => {
+    if (!audio.value.paused && !newValue) {
+      audio.value.pause();
+    } else {
+      audio.value.play();
+    }
   }
 );
 </script>
@@ -209,7 +163,7 @@ watch(
 <template>
   <div class="net-easy-player">
     <div class="background-flitter" :style="`background-image: url(${song?.image});`"></div>
-    <div class="music-mask">{{ state.currentTime }}</div>
+    <div class="music-mask"></div>
 
     <audio
       ref="audio"
@@ -260,8 +214,8 @@ watch(
       </div>
       <div class="play-icon-container">
         <img class="play-icon" src="../assets/arrow_01.png" @click="onChangeSong('last')" alt="上一曲" />
-        <img v-show="!state.isPlay" @click="controlPlay" class="play-icon" src="../assets/play_01.png" alt="播放" />
-        <img v-show="state.isPlay" @click="controlPlay" class="play-icon" src="../assets/play_02.png" alt="暂停" />
+        <img v-show="!isPlay" @click="controlPlay" class="play-icon" src="../assets/play_01.png" alt="播放" />
+        <img v-show="isPlay" @click="controlPlay" class="play-icon" src="../assets/play_02.png" alt="暂停" />
         <img class="play-icon" src="../assets/arrow_02.png" @click="onChangeSong('next')" alt="下一曲" />
       </div>
       <div class="music-speed">
@@ -269,15 +223,6 @@ watch(
           <div>{{ song.name }}</div>
           <div>{{ TimeToString(state.currentTime) }}/{{ TimeToString(state.endTime) }}</div>
         </div>
-        <!-- <div class="process-container">
-          <div class="process-bar" ref="track" id="audio-bar">
-            <div class="progress-box" :style="{ width: audioProgressPercent }">
-              <div class="play-point" :style="{ transform: 'translateX(' + state.thumbTranslateX + 'px)' }">
-                <img src="../assets/dot_01.png" alt="" />
-              </div>
-            </div>
-          </div>
-        </div> -->
         <el-slider
           v-model="state.currentTime"
           :min="0"
@@ -427,6 +372,7 @@ watch(
             background: rgba(235, 227, 227, 0.6);
             border-radius: var(--border-width);
             box-shadow: none;
+
             &::before {
               display: none;
             }
@@ -500,8 +446,8 @@ watch(
       box-sizing: border-box;
 
       .play-icon {
-        width: 42px;
-        height: 42px;
+        width: 40px;
+        height: 40px;
         display: block;
         cursor: pointer;
       }
@@ -533,54 +479,6 @@ watch(
         display: flex;
         justify-content: space-between;
         font-size: 14px;
-      }
-
-      .process-container {
-        width: 100%;
-        height: 24px;
-        margin-top: 12px;
-        position: relative;
-
-        .process-bar {
-          position: absolute;
-          z-index: 10;
-          top: -5px;
-          width: 100%;
-          height: 5px;
-          background: rgba(255, 255, 255, 0.5);
-          border-radius: 5px;
-          cursor: pointer;
-
-          .progress-box {
-            height: 100%;
-            background: #40ce8f;
-            position: relative;
-            border-radius: 5px;
-
-            .play-point {
-              transition: -webkit-transform 0.2s linear;
-              transition: transform 0.2s linear;
-              transition: transform 0.2s linear, -webkit-transform 0.2s linear;
-              position: absolute;
-              width: 18px;
-              height: 18px;
-              border-radius: 9px;
-              top: -4px;
-              cursor: pointer;
-
-              img {
-                display: block;
-                position: absolute;
-                top: -2px;
-                width: 18px;
-                height: 18px;
-                background: #fff;
-                border-radius: 9px;
-                margin-left: -9px;
-              }
-            }
-          }
-        }
       }
     }
 

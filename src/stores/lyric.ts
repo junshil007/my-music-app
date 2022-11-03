@@ -3,10 +3,10 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-27
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-10-31
+ * @LastEditTime: 2022-11-03
  */
-import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { defineStore, storeToRefs } from "pinia";
+import { reactive, watch } from "vue";
 import { useSongStore } from "./song";
 import { GetLiricInfo } from "@/api";
 
@@ -16,6 +16,34 @@ interface ILyricInfo {
   uid: string;
   index: number;
 }
+
+export const useLyricStore = defineStore("lyric", () => {
+  //song为计算属性ComputedRefImpl  记得加上value 读取值
+  const { song } = storeToRefs(useSongStore());
+
+  console.log(song.value);
+
+  const lyricInfo = reactive<ILyricInfo[]>([]);
+
+  const getMusicLiric = async () => {
+    if (!song.value.id) return;
+    let res = await GetLiricInfo(song.value.id as number);
+    Object.assign(lyricInfo, GetLyricList(res.lrc.lyric));
+  };
+
+  watch(
+    () => song.value.id,
+    (newValue) => {
+      console.log(newValue, "song.value.id");
+      getMusicLiric();
+    },
+    {
+      deep: true,
+    }
+  );
+
+  return { lyricInfo, getMusicLiric };
+});
 
 const GetLyricList = (lrc: string) => {
   let lyricsObjArr: {}[] = [];
@@ -62,16 +90,3 @@ const TimeToSeconds = (time: string) => {
   }
   return Number(sec + "." + ms);
 };
-
-export const useLyricStore = defineStore("lyric", () => {
-  const lyricInfo = reactive<ILyricInfo[]>([]);
-
-  const getMusicLiric = async () => {
-    const { song } = useSongStore();
-    if (!song.id) return;
-    let res = await GetLiricInfo(song.id as number);
-    Object.assign(lyricInfo, GetLyricList(res.lrc.lyric));
-  };
-
-  return { lyricInfo, getMusicLiric };
-});

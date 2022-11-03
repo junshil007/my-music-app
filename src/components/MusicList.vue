@@ -2,21 +2,19 @@
 import { computed, reactive, ref } from "vue";
 import { format } from "@/utils/util";
 import { useSongStore } from "@/stores/song";
-import { useLyricStore } from "@/stores/lyric";
 import { VideoPlay, Delete, VideoPause } from "@element-plus/icons-vue";
 import type { Song } from "@/utils/song";
+import { storeToRefs } from "pinia";
 
 interface Props {
   list?: Song[];
   listType?: string;
 }
 
-const LIST_TYPE_ALBUM = "album";
 const LIST_TYPE_DURATION = "duration";
-const LIST_TYPE_PULLUP = "pullup";
 
-const { song, selectPlay, onPlaying } = useSongStore();
-const { getMusicLiric } = useLyricStore();
+const { song, isPlay } = storeToRefs(useSongStore());
+const { selectPlay, onChangePlay } = useSongStore();
 
 const props = withDefaults(defineProps<Props>(), {
   list: () => [],
@@ -24,7 +22,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const listType = ref(props.listType);
-const playing = ref(true);
 
 const list = computed(() => {
   return props.list;
@@ -39,18 +36,17 @@ const isDuration = computed(() => {
  * 同时加载歌词
  */
 const onPlayMusic = (item: any) => {
+  console.log(item, "item");
+
   selectPlay(item);
-  onPlaying(true);
-  playing.value = true;
-  getMusicLiric();
+  onChangePlay(true);
 };
 
 /**
  * @param item 暂停正在播放的歌曲
  */
 const onPauseMusic = (item: any) => {
-  onPlaying(false);
-  playing.value = false;
+  onChangePlay(false);
 };
 
 const deleteItem = (index: number) => {
@@ -73,14 +69,14 @@ const deleteItem = (index: number) => {
           v-for="(item, index) in list"
           :key="item.id"
           class="list-item"
-          :class="{ on: playing && song.id === item.id }"
+          :class="{ on: isPlay && song.id === item.id }"
         >
           <span class="list-num" v-text="index + 1"></span>
           <div class="list-name">
             <span>{{ item.name }}</span>
             <div class="list-menu">
               <div class="hover list-menu-icon-do">
-                <el-icon size="large" v-if="playing && song.id === item.id" @click="onPauseMusic(item)">
+                <el-icon size="large" v-if="isPlay && song.id === item.id" @click="onPauseMusic(item)">
                   <VideoPause
                 /></el-icon>
                 <el-icon size="large" v-else @click="onPlayMusic(item)"><VideoPlay /></el-icon>

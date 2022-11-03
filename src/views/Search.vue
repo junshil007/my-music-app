@@ -3,17 +3,19 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-24
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-11-01
+ * @LastEditTime: 2022-11-03
 -->
 <script setup lang="ts">
 import { onMounted, reactive } from "vue";
 import { search, searchHot } from "@/api/index";
 import { formatTopSongs, Song } from "@/utils/song";
 import MusicList from "@/components/MusicList.vue";
+import type { ISong } from "@/stores/song";
+import { useSongStore } from "@/stores/song";
 
 const state = reactive({
-  Artists: [] as Song, // 热搜数组
-  list: [] as Song, // 搜索数组
+  Artists: [] as { first: string }[], // 热搜数组
+  list: [] as ISong[], // 搜索数组
   searchValue: "", // 搜索关键词
   page: 0, // 分页
   limit: 30, // 默认查询长度
@@ -23,6 +25,8 @@ const clickHot = (name: string) => {
   state.searchValue = name;
   onEnter();
 };
+
+const { getSearchList, songList } = useSongStore();
 
 // 搜索事件
 const onEnter = async () => {
@@ -34,15 +38,11 @@ const onEnter = async () => {
   if (state.list.length > 0) {
     // this.$refs.musicList.scrollTo();
   }
-  let { result, code } = await search({
+  return getSearchList({
     offset: 0,
     limit: 30,
     keywords: state.searchValue,
   });
-  if (code === 200) {
-    state.list = formatTopSongs(result.songs);
-    console.log(state.list);
-  }
 };
 
 onMounted(() => {
@@ -67,7 +67,7 @@ onMounted(() => {
         @keyup.enter="onEnter"
       />
     </div>
-    <MusicList ref="musicList" :list="state.list" list-type="pullup" />
+    <MusicList ref="musicList" :list="songList" list-type="pullup" />
   </div>
 </template>
 

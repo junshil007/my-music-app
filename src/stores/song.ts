@@ -3,14 +3,15 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-18
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-10-31
+ * @LastEditTime: 2022-11-03
  */
 import { ref, reactive, computed } from "vue";
-import { defineStore, storeToRefs } from "pinia";
+import { defineStore } from "pinia";
 import { getPlayListDetail } from "@/api/index";
-import { formatTopSongs } from "@/utils/song";
+import { formatTopSongs, formatSongs } from "@/utils/song";
+import { search } from "@/api/index";
 
-interface ISong {
+export interface ISong {
   /** 歌曲id */
   id?: number;
   /** 歌曲id */
@@ -20,7 +21,7 @@ interface ISong {
   /** 专辑 */
   album?: string;
   /** 歌曲背景图 */
-  image: string;
+  image?: string;
   /** 歌曲时长 */
   duration?: number;
   /** 歌曲播放地址 */
@@ -29,41 +30,41 @@ interface ISong {
 
 export const useSongStore = defineStore("song", () => {
   const currentIndex = ref<number>(0);
-  const song = reactive<ISong>({
-    image: "https://peiyinimg.qupeiyin.cn/1629950282884-288.jpg",
+  const isPlay = ref<boolean>(false);
+  const loading = ref<boolean>(false);
+  const defaultSong = {
+    id: null,
     name: "",
-  });
-
-  // const song = computed(() => {
-  //   return songList[currentIndex.value];
-  // });
-
+    url: "",
+    image: "https://peiyinimg.qupeiyin.cn/1629950282884-288.jpg",
+  };
   const songList = reactive<ISong[]>([]);
 
-  const playing = ref<boolean>(false);
+  const song = computed(() => {
+    return songList.length > 0 ? songList[currentIndex.value] : defaultSong;
+  });
 
-  // 更新播放状态
-  function onPlaying(type: boolean) {
-    if (!song.url) {
-      return console.log("请选择歌曲");
-    }
-    playing.value = type;
-  }
-
-  // 选择播放
-  function selectPlay(item: any) {
-    currentIndex.value = findIndex(songList, item);
-    Object.assign(song, item);
-  }
-
-  // 获取歌单
+  /**获取歌单*/
   async function getSongList(id: string) {
+    loading.value = true;
     let { code, playlist } = await getPlayListDetail(id);
     if (code === 200 && Array.isArray(playlist.trackIds)) {
       Object.assign(songList, { ...formatTopSongs(playlist.tracks) });
+      console.log("getSongList", formatTopSongs(playlist.tracks));
+
+      loading.value = false;
     } else {
       new Error("获取歌单详情失败");
+      loading.value = false;
       return;
+    }
+  }
+
+  /** 搜索歌曲 */
+  async function getSearchList(params: any) {
+    let { result, code } = await search(params);
+    if (code === 200) {
+      Object.assign(songList, { ...formatTopSongs(result.songs) });
     }
   }
 
@@ -73,7 +74,12 @@ export const useSongStore = defineStore("song", () => {
     });
   }
 
-  // 切换歌曲
+  /**选择播放*/
+  function selectPlay(item: any) {
+    currentIndex.value = findIndex(songList, item);
+  }
+
+  /**切换歌曲*/
   function onChangeSong(type: string) {
     if (type === "next") {
       currentIndex.value = currentIndex.value + 1 > songList.length - 1 ? 0 : currentIndex.value + 1;
@@ -82,20 +88,28 @@ export const useSongStore = defineStore("song", () => {
     }
     let item = songList[currentIndex.value];
     Object.assign(song, item);
-    //开启播放
-    if (!playing.value) {
-      onPlaying(true);
-    }
+  }
+
+  /**暂停播放歌曲*/
+  function onChangePlay(type: boolean) {
+    isPlay.value = type;
+  }
+
+  /** 加载动作 */
+  function onChangeLoading(type: boolean) {
+    loading.value = type;
   }
 
   return {
     song,
     songList,
-    playing,
     currentIndex,
-    onPlaying,
+    isPlay,
+    loading,
     selectPlay,
+    getSearchList,
     getSongList,
     onChangeSong,
+    onChangePlay,
   };
 });
