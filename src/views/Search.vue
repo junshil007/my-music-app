@@ -3,7 +3,7 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-24
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-11-03
+ * @LastEditTime: 2022-12-06
 -->
 <script setup lang="ts">
 import { onMounted, reactive } from "vue";
@@ -38,9 +38,6 @@ const onEnter = async () => {
     return;
   }
   state.page = 0;
-  if (state.list.length > 0) {
-    // this.$refs.musicList.scrollTo();
-  }
   return getSearchList({
     offset: 0,
     limit: 30,
@@ -57,9 +54,17 @@ onMounted(() => {
 
 <template>
   <!--搜索-->
-  <div class="search" v-loading.fullscreen.lock="loading" element-loading-background="rgba(0, 0, 0, 0.4)">
+  <div
+    class="search"
+    v-loading.fullscreen.lock="loading"
+    element-loading-background="rgba(0, 0, 0, 0.4)"
+  >
     <div class="search-head">
-      <span v-for="(item, index) in state.Artists" :key="index" @click="clickHot(item.first)">
+      <span
+        v-for="(item, index) in state.Artists"
+        :key="index"
+        @click="clickHot(item.first)"
+      >
         {{ item.first }}
       </span>
       <input

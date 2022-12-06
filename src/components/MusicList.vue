@@ -76,10 +76,16 @@ const deleteItem = (index: number) => {
             <span>{{ item.name }}</span>
             <div class="list-menu">
               <div class="hover list-menu-icon-do">
-                <el-icon size="large" v-if="isPlay && song.id === item.id" @click="onPauseMusic(item)">
-                  <VideoPause
-                /></el-icon>
-                <el-icon size="large" v-else @click="onPlayMusic(item)"><VideoPlay /></el-icon>
+                <el-icon
+                  size="large"
+                  v-if="isPlay && song.id === item.id"
+                  @click="onPauseMusic(item)"
+                >
+                  <VideoPause />
+                </el-icon>
+                <el-icon size="large" v-else @click="onPlayMusic(item)">
+                  <VideoPlay />
+                </el-icon>
               </div>
             </div>
           </div>
@@ -87,10 +93,14 @@ const deleteItem = (index: number) => {
           <span v-if="isDuration" class="list-time">
             {{ format(item.duration % 3600) }}
             <span class="hover list-menu-icon-del">
-              <el-icon size="large"><Delete /></el-icon>
+              <el-icon size="large">
+                <Delete />
+              </el-icon>
             </span>
           </span>
-          <span v-else class="list-album" @click="deleteItem(item)">{{ item.album }}</span>
+          <span v-else class="list-album" @click="deleteItem(item)">{{
+            item.album
+          }}</span>
         </div>
         <slot name="listBtn"></slot>
       </div>
@@ -99,7 +109,8 @@ const deleteItem = (index: number) => {
 </template>
 
 <style lang="less" scoped>
-@import url("@/styles/mixin.less");
+@import url('@/styles/mixin.less');
+
 .list-header {
   border-bottom: 1px solid @list_head_line_color;
   color: @text_color_active;
@@ -115,7 +126,7 @@ const deleteItem = (index: number) => {
 .list-content {
   width: 100%;
   font-size: 14px;
-  height: calc(~"100% - 60px");
+  height: calc(~'100% - 60px');
   overflow-x: hidden;
   overflow-y: auto;
 
@@ -149,7 +160,7 @@ const deleteItem = (index: number) => {
 
     .list-num {
       font-size: 0;
-      background: url("@/assets/wave.gif") no-repeat center center;
+      background: url('@/assets/img/wave.gif') no-repeat center center;
     }
   }
 
@@ -163,7 +174,7 @@ const deleteItem = (index: number) => {
     }
   }
 
-  &:not([class*="list-header"]):hover {
+  &:not([class*='list-header']):hover {
     .list-name {
       padding-right: 80px;
 
@@ -174,6 +185,7 @@ const deleteItem = (index: number) => {
 
     .list-time {
       font-size: 0;
+
       .list-menu-icon-del {
         display: contents;
       }
@@ -228,9 +240,11 @@ const deleteItem = (index: number) => {
     display: block;
     width: 300px;
     .no-wrap();
+
     @media (max-width: 1440px) {
       width: 200px;
     }
+
     @media (max-width: 1200px) {
       width: 150px;
     }

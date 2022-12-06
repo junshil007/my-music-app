@@ -3,116 +3,117 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-18
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-11-03
+ * @LastEditTime: 2022-12-06
 -->
 <script setup lang="ts">
-import { useRouter, useRoute } from "vue-router";
-import { ref, reactive, watch } from "vue";
+import { ref, reactive, watch, onMounted } from "vue"
+import { VideoPlay, VideoPause } from "@element-plus/icons-vue"
 
-import SongInfo from "@/components/SongInfo.vue";
-import MenuTab from "@/components/MenuTab.vue";
+import { TimeToString } from "@/utils/util"
+import { storeToRefs } from "pinia"
+import { useSongStore } from "@/stores/song"
+import { useLyricStore } from "@/stores/lyric"
 
-import { storeToRefs } from "pinia";
-import { useSongStore } from "@/stores/song";
-import { useLyricStore } from "@/stores/lyric";
-
-const router = useRouter();
+import SongInfo from "@/components/SongInfo.vue"
+import MenuTab from "@/components/MenuTab.vue"
 
 const state = reactive({
-  isPlay: false,
-  menuList: ["正在播放", "推荐", "搜索", "播放历史"],
-  mentRouter: ["playlist", "toplist", "search", "historylist"],
-  /**当前分类*/
-  activeIndex: 0,
-  songList: [],
-  audioProgress: 0, // 进度
-  playType: 1, // 播放类型，1:列表循环  2：随机播放 3：单曲循环
-  playIndex: 0, // 当前播放哪一首
-  thumbTranslateX: 0,
-  lyricIndex: 0, // 歌词到哪一行了
-  currentTime: 0, // 当前播放进度
-  progressL: 0, // 进度条总长度
-  lyricInfo: [],
+  /**当前分类 播放类型，1:列表循环  2：随机播放 3：单曲循环*/
+  playType: 1,
+  playTypeIcon: [ "liebiaoxunhuan", "suijibofang", "danquxunhuan" ],
+  playTypeTitle: [ "列表循环", "随机播放", "单曲循环" ],
+  /** 歌词到哪一行了*/
+  lyricIndex: 0,
+  /**当前播放进度 */
+  currentTime: 0,
+  /**  歌曲总时长 */
   endTime: 0,
-  volume: 80,
-  playStatus: false, // 搜索或者历史播放完成后关闭播放状态按钮
-});
-const audio = ref();
-const { song, isPlay } = storeToRefs(useSongStore());
-const { onChangeSong, onChangePlay } = useSongStore();
-const { lyricInfo } = useLyricStore();
+  /** 歌曲音量 */
+  volume: 20,
+  /** 当前是否拖拉进度条 */
+  progressState: false
+})
 
-const ChangeActive = async (index: number) => {
-  state.activeIndex = index;
-  router.push({
-    path: `/${state.mentRouter[state.activeIndex]}`,
-  });
-};
-
-const TimeToString = (seconds: string) => {
-  let param = parseInt(seconds);
-  let hh = "",
-    mm = "",
-    ss = "";
-  if (param >= 0 && param < 60) {
-    param < 10 ? (ss = "0" + param) : (ss = param);
-    return "00:" + ss;
-  } else if (param >= 60 && param < 3600) {
-    mm = parseInt(param / 60);
-    mm < 10 ? (mm = "0" + mm) : mm;
-    param - parseInt(mm * 60) < 10 ? (ss = "0" + String(param - parseInt(mm * 60))) : (ss = param - parseInt(mm * 60));
-    return mm + ":" + ss;
+/**
+ * 更改播放模式
+ */
+const onChangePlayType = () => {
+  if (state.playType == 3) {
+    state.playType = 1
+  } else {
+    state.playType++
   }
-};
+}
+
+const audio = ref()
+const { song, isPlay } = storeToRefs(useSongStore())
+const { onChangeSong, onChangePlay } = useSongStore()
+const { lyricInfo } = useLyricStore()
 
 /**
  * 获取音乐时长
  */
-function getDuration() {
-  state.endTime = audio.value.duration;
+const getDuration = () => {
+  state.endTime = audio.value.duration
 }
 
 /**
  *  当前播放时间
  */
-const timeupdate = (e: any) => {
-  let compareTime = e.target.currentTime;
+const getTimeupdate = (e: any) => {
+  if (state.progressState) return
+  let compareTime = e.target.currentTime
   for (let i = 0; i < lyricInfo.length; i++) {
-    if (compareTime > lyricInfo[i].time) {
-      const index = lyricInfo[i].index;
+    if (compareTime > lyricInfo[ i ].time) {
+      const index = lyricInfo[ i ].index
       if (i === index) {
-        state.lyricIndex = i;
+        state.lyricIndex = i
       }
     }
   }
-  state.currentTime = compareTime;
-};
+  state.currentTime = compareTime
+}
 
 /**
  * 通过进度条改变当前音频进度
  * @param value 当前的值
  */
-function changeCurrentTime(value: number) {
-  audio.value.currentTime = parseInt(value);
-  state.currentTime = value;
+function changeCurrentTime (value: number) {
+  audio.value.currentTime = value
+  state.currentTime = value
 }
+
+/**
+ *拖拽进度条
+ */
+function changeProgressState () {
+  state.progressState = false
+}
+
+/**
+ * 页面生命周期入口
+ */
+onMounted(() => {
+  /** 对进度条做拖拽监听 */
+  window.addEventListener("mouseup", changeProgressState)
+})
 
 /**
  * 播放到媒体的结束位置
  */
 const palyEnded = () => {
-  console.log("is play end", state.playType);
-  onChangeSong("next");
-};
+  console.log("is play end", state.playType)
+  onChangeSong("next")
+}
 
 /**
  * 控制播放按钮
  */
-function play() {
-  onChangePlay(true);
+function play () {
+  onChangePlay(true)
 }
-function pause() {
-  onChangePlay(false);
+function pause () {
+  onChangePlay(false)
 }
 
 /**
@@ -121,21 +122,21 @@ function pause() {
 watch(
   () => song.value.url,
   (newValue) => {
-    audio.value.load();
-    var playPromise = audio.value.play();
+    audio.value.load()
+    var playPromise = audio.value.play()
     if (playPromise !== undefined) {
       playPromise
         .then((_: any) => {
-          play();
+          play()
         })
         .catch((error: any) => {
-          audio.value.load();
+          audio.value.load()
           // play();
-          console.log(error);
-        });
+          console.log(error)
+        })
     }
   }
-);
+)
 /**
  * 监听播放开启变化
  */
@@ -143,12 +144,12 @@ watch(
   () => isPlay.value,
   (newValue) => {
     if (!audio.value.paused && !newValue) {
-      audio.value.pause();
+      audio.value.pause()
     } else {
-      audio.value.play();
+      audio.value.play()
     }
   }
-);
+)
 </script>
 
 <template>
@@ -156,16 +157,8 @@ watch(
     <div class="background-flitter" :style="`background-image: url(${song?.image});`"></div>
     <div class="music-mask"></div>
 
-    <audio
-      ref="audio"
-      hidden="true"
-      @canplay="getDuration"
-      @timeupdate="timeupdate"
-      @ended="palyEnded"
-      @play="play"
-      @pause="pause"
-      :volume="state.volume / 100"
-    >
+    <audio ref="audio" hidden="true" @canplay="getDuration" @timeupdate="getTimeupdate" @ended="palyEnded" @play="play"
+      @pause="pause" :volume="state.volume / 100">
       <source :src="song?.url" type="audio/mpeg" />
     </audio>
     <div class="music-header">
@@ -179,12 +172,6 @@ watch(
           <MenuTab></MenuTab>
         </div>
         <div class="main-container">
-          <!-- <router-view v-slot="{ Component }">
-            <keep-alive>
-              <component :is="Component" :key="$route.name" v-if="$route.meta.keepAlive" />
-            </keep-alive>
-            <component :is="Component" :key="$route.name" v-if="!$route.meta.keepAlive" />
-          </router-view> -->
           <RouterView />
         </div>
       </div>
@@ -198,8 +185,14 @@ watch(
       </div>
       <div class="play-icon-container">
         <img class="play-icon" src="../assets/arrow_01.png" @click="onChangeSong('last')" alt="上一曲" />
-        <img v-show="!isPlay" @click="play" class="play-icon" src="../assets/play_01.png" alt="播放" />
-        <img v-show="isPlay" @click="pause" class="play-icon" src="../assets/play_02.png" alt="暂停" />
+        <!-- <el-icon :size="40" v-show="!isPlay" @click="play">
+          <VideoPlay />
+        </el-icon>
+        <el-icon :size="40" v-show="isPlay" @click="pause">
+          <VideoPause />
+        </el-icon> -->
+        <img v-show="!isPlay" @click="play" class="play-icon-big" src="../assets/play_01.png" alt="播放" />
+        <img v-show="isPlay" @click="pause" class="play-icon-big" src="../assets/play_02.png" alt="暂停" />
         <img class="play-icon" src="../assets/arrow_02.png" @click="onChangeSong('next')" alt="下一曲" />
       </div>
       <div class="music-speed">
@@ -207,27 +200,21 @@ watch(
           <div>{{ song.name }}</div>
           <div>{{ TimeToString(state.currentTime) }}/{{ TimeToString(state.endTime) }}</div>
         </div>
-        <el-slider
-          v-model="state.currentTime"
-          :min="0"
-          :step="0.1"
-          :max="state.endTime"
-          :show-tooltip="false"
-          :show-input-controls="false"
-          @change="changeCurrentTime"
-        />
+        <el-slider v-model="state.currentTime" :min="0" :step="0.1" :max="state.endTime" :show-tooltip="false"
+          :show-input-controls="false" @mousedown.native="state.progressState = true"
+          @mouseup.native="changeProgressState" @change="changeCurrentTime" />
       </div>
       <div class="action-container">
-        <el-dropdown>
-          <span class="el-dropdown-link"> 模式 </span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item>列表循环</el-dropdown-item>
-              <el-dropdown-item>随机播放</el-dropdown-item>
-              <el-dropdown-item>单曲循环</el-dropdown-item>
-            </el-dropdown-menu>
+        <!-- 1:列表循环  2：随机播放 3：单曲循环*/ -->
+        <el-tooltip class="box-item" effect="dark" raw-content placement="top-start">
+          <template #content>
+            <p style="word-break: keep-all;">{{ state.playTypeTitle[ state.playType - 1 ] }}</p>
           </template>
-        </el-dropdown>
+          <div :class="`icon-${state.playTypeIcon[ state.playType - 1 ]} icon-default-size iconfont`"
+            @click="onChangePlayType">
+
+          </div>
+        </el-tooltip>
         <div class="volume">
           <el-slider v-model="state.volume"></el-slider>
         </div>
@@ -301,6 +288,7 @@ watch(
         position: relative;
         overflow: auto;
       }
+
       .list-main {
         width: calc(~"100% - 320px");
         height: 100%;
@@ -341,6 +329,13 @@ watch(
       box-sizing: border-box;
 
       .play-icon {
+        width: 36px;
+        height: 36px;
+        display: block;
+        cursor: pointer;
+      }
+
+      .play-icon-big {
         width: 40px;
         height: 40px;
         display: block;
@@ -385,8 +380,19 @@ watch(
       padding: 0 20px;
       box-sizing: border-box;
 
-      .el-dropdown-link {
+      .iconfont {
+        flex: 1;
+        text-align: center;
         color: #fff;
+
+        &:hover {
+          color: @vue_color;
+        }
+      }
+
+      .box-item {
+        width: 110px;
+        margin-top: 10px;
       }
 
       .volume {

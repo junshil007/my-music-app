@@ -1,0 +1,131 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 3796941 */
+  src: url("//at.alicdn.com/t/c/font_3796941_qcvb3wv679c.woff2?t=1669630259306") format("woff2"),
+    url("//at.alicdn.com/t/c/font_3796941_qcvb3wv679c.woff?t=1669630259306") format("woff"),
+    url("//at.alicdn.com/t/c/font_3796941_qcvb3wv679c.ttf?t=1669630259306") format("truetype");
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-big-size {
+  font-size: 40px;
+}
+
+.icon-default-size {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.icon-suijibofang:before {
+  content: "\e6a1";
+}
+
+.icon-shunxubofang:before {
+  content: "\e6a2";
+}
+
+.icon-danquxunhuan:before {
+  content: "\e6a3";
+}
+
+.icon-liebiaoxunhuan:before {
+  content: "\e6a4";
+}
+
+.icon-bofangMV:before {
+  content: "\e6a5";
+}
+
+.icon-tianjiadao:before {
+  content: "\e6a6";
+}
+
+.icon-jubao:before {
+  content: "\e6a7";
+}
+
+.icon-huiyuanzhuanxiang:before {
+  content: "\e6a8";
+}
+
+.icon-xiayishou:before {
+  content: "\e62c";
+}
+
+.icon-kuaitui:before {
+  content: "\e68e";
+}
+
+.icon-kuaijin:before {
+  content: "\e68f";
+}
+
+.icon-gengduo:before {
+  content: "\e691";
+}
+
+.icon-tinggeshiqu:before {
+  content: "\e692";
+}
+
+.icon-zanting:before {
+  content: "\e693";
+}
+
+.icon-shangyiqu:before {
+  content: "\e694";
+}
+
+.icon-xiayiqu:before {
+  content: "\e695";
+}
+
+.icon-tuichu:before {
+  content: "\e696";
+}
+
+.icon-lishibofang:before {
+  content: "\e697";
+}
+
+.icon-yinleguan:before {
+  content: "\e698";
+}
+
+.icon-shipin:before {
+  content: "\e699";
+}
+
+.icon-bofangliebiao:before {
+  content: "\e69a";
+}
+
+.icon-yinliang:before {
+  content: "\e69b";
+}
+
+.icon-bofangduilie:before {
+  content: "\e69c";
+}
+
+.icon-shoucang:before {
+  content: "\e69d";
+}
+
+.icon-xiazai:before {
+  content: "\e69e";
+}
+
+.icon-pinglun:before {
+  content: "\e69f";
+}
+
+.icon-erji:before {
+  content: "\e6a0";
+}

@@ -3,7 +3,7 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-18
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-11-03
+ * @LastEditTime: 2022-11-04
  */
 import { ref, reactive, computed } from "vue";
 import { defineStore } from "pinia";
@@ -29,6 +29,7 @@ export interface ISong {
 }
 
 export const useSongStore = defineStore("song", () => {
+  /** 当前播放哪一首 */
   const currentIndex = ref<number>(0);
   const isPlay = ref<boolean>(false);
   const loading = ref<boolean>(false);
