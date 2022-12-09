@@ -3,60 +3,59 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-11-03
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-11-03
+ * @LastEditTime: 2022-12-09
 -->
 
 <script setup lang="ts">
-import { includes } from "lodash";
-import { reactive, onMounted, watch, getCurrentInstance } from "vue";
-import { useRouter, useRoute } from "vue-router";
+  import { reactive, onMounted, watch, getCurrentInstance } from "vue";
+  import { useRouter, useRoute } from "vue-router";
 
-const route = useRoute();
-const router = useRouter();
+  const route = useRoute();
+  const router = useRouter();
 
-const state = reactive({
-  menuList: ["正在播放", "推荐", "搜索", "播放历史"],
-  mentRouter: ["playlist", "toplist", "search", "historylist"],
-  /**当前分类*/
-  activeIndex: 0,
-});
-
-const ChangeActive = async (index: number) => {
-  state.activeIndex = index;
-  router.push({
-    path: `/${state.mentRouter[state.activeIndex]}`,
+  const state = reactive({
+    menuList: ["热门歌曲", "推荐", "搜索", "播放历史"],
+    mentRouter: ["playlist", "toplist", "search", "historylist"],
+    /**当前分类*/
+    activeIndex: 0,
   });
-};
 
-watch(
-  () => route.name,
-  (n) => {
-    getCurrentIndex(n as string);
-  }
-);
+  const ChangeActive = async (index: number) => {
+    state.activeIndex = index;
+    router.push({
+      path: `/${state.mentRouter[state.activeIndex]}`,
+    });
+  };
 
-const getCurrentIndex = (n: string) => {
-  let index = 0;
-  switch (n) {
-    case "PlayList":
-      index = 0;
-      break;
-    case "TopList":
-    case "Details":
-      index = 1;
-      break;
-    case "Search":
-      index = 2;
-      break;
-    case "HistoryList":
-      index = 3;
-      break;
-    default:
-      index = 0;
-      break;
-  }
-  state.activeIndex = index;
-};
+  watch(
+    () => route.name,
+    (n) => {
+      getCurrentIndex(n as string);
+    }
+  );
+
+  const getCurrentIndex = (n: string) => {
+    let index = 0;
+    switch (n) {
+      case "PlayList":
+        index = 0;
+        break;
+      case "TopList":
+      case "Details":
+        index = 1;
+        break;
+      case "Search":
+        index = 2;
+        break;
+      case "HistoryList":
+        index = 3;
+        break;
+      default:
+        index = 0;
+        break;
+    }
+    state.activeIndex = index;
+  };
 </script>
 
 <template>
@@ -111,7 +110,12 @@ const getCurrentIndex = (n: string) => {
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(120deg, transparent, @vue_color_option, transparent);
+      background: linear-gradient(
+        120deg,
+        transparent,
+        @vue_color_option,
+        transparent
+      );
       transition: all 650ms;
     }
 

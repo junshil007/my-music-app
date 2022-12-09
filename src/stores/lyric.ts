@@ -3,7 +3,7 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-27
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-11-03
+ * @LastEditTime: 2022-12-09
  */
 import { defineStore, storeToRefs } from "pinia";
 import { reactive, watch } from "vue";
@@ -43,6 +43,13 @@ export const useLyricStore = defineStore("lyric", () => {
   );
 
   return { lyricInfo, getMusicLiric };
+}, {
+  persist: {
+    enabled: true, // 这个配置代表存储生效,而且是整个store都存储,默认情况下整个状态将存储在 sessionStorage 中
+    strategies: [
+      { storage: sessionStorage, paths: ['lyricInfo'] },
+    ],
+  }
 });
 
 const GetLyricList = (lrc: string) => {

@@ -49,7 +49,7 @@ export default {
     },
   },
   setup(props, { emit }) {
-    console.log(props.lyricInfo);
+    console.log(props.lyricInfo,'props.lyricInfo');
     const state = reactive({
       lyricInfo: [],
       audioProgress: 0,

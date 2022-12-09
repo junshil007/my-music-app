@@ -22,14 +22,15 @@ const state = reactive({
   limit: 30, // 默认查询长度
 });
 
-const { loading } = storeToRefs(useSongStore());
+const { loading, songList } = storeToRefs(useSongStore());
 
 const clickHot = (name: string) => {
   state.searchValue = name;
   onEnter();
 };
 
-const { getSearchList, songList } = useSongStore();
+const { getSearchList, onChangeSongType } = useSongStore();
+
 
 // 搜索事件
 const onEnter = async () => {
@@ -49,6 +50,7 @@ onMounted(() => {
   searchHot().then(({ result }) => {
     state.Artists = result.hots.slice(0, 5);
   });
+  onChangeSongType('search')
 });
 </script>
 
@@ -75,7 +77,12 @@ onMounted(() => {
         @keyup.enter="onEnter"
       />
     </div>
-    <MusicList ref="musicList" :list="songList" list-type="pullup" />
+    <MusicList
+      ref="musicList"
+      key="search_key"
+      :list="songList"
+      list-type="search"
+    />
   </div>
 </template>
 

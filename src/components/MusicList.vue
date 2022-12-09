@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
 import { format } from "@/utils/util";
-import { useSongStore } from "@/stores/song";
+import { useSongStore, type ISong } from "@/stores/song";
 import { VideoPlay, Delete, VideoPause } from "@element-plus/icons-vue";
-import type { Song } from "@/utils/song";
+
 import { storeToRefs } from "pinia";
 
 interface Props {
-  list?: Song[];
+  list?: ISong[];
   listType?: string;
 }
 
@@ -37,7 +37,6 @@ const isDuration = computed(() => {
  */
 const onPlayMusic = (item: any) => {
   console.log(item, "item");
-
   selectPlay(item);
   onChangePlay(true);
 };
@@ -109,7 +108,7 @@ const deleteItem = (index: number) => {
 </template>
 
 <style lang="less" scoped>
-@import url('@/styles/mixin.less');
+@import url("@/styles/mixin.less");
 
 .list-header {
   border-bottom: 1px solid @list_head_line_color;
@@ -126,7 +125,7 @@ const deleteItem = (index: number) => {
 .list-content {
   width: 100%;
   font-size: 14px;
-  height: calc(~'100% - 60px');
+  height: calc(~"100% - 60px");
   overflow-x: hidden;
   overflow-y: auto;
 
@@ -160,7 +159,7 @@ const deleteItem = (index: number) => {
 
     .list-num {
       font-size: 0;
-      background: url('@/assets/img/wave.gif') no-repeat center center;
+      background: url("@/assets/img/wave.gif") no-repeat center center;
     }
   }
 
@@ -174,7 +173,7 @@ const deleteItem = (index: number) => {
     }
   }
 
-  &:not([class*='list-header']):hover {
+  &:not([class*="list-header"]):hover {
     .list-name {
       padding-right: 80px;
 
