@@ -16,6 +16,7 @@
 
   import SongInfo from "@/components/SongInfo.vue";
   import MenuTab from "@/components/MenuTab.vue";
+  import MusicHeader from "@/components/Header.vue";
 
   const state = reactive({
     /**当前分类 播放类型，1:列表循环  2：随机播放 3：单曲循环*/
@@ -176,11 +177,7 @@
     >
       <source :src="song?.url" type="audio/mpeg" />
     </audio>
-    <div class="music-header">
-      <div></div>
-      <div>vue3开发播放器</div>
-      <div>登录</div>
-    </div>
+    <MusicHeader></MusicHeader>
     <div class="music-container">
       <div class="list-main">
         <div class="menu-box">
