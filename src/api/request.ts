@@ -3,7 +3,7 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-18
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-10-31
+ * @LastEditTime: 2022-12-12
  */
 
 interface IBaseResponse<T> {
@@ -34,9 +34,10 @@ interface IBaseResponse<T> {
 
 import axios, { AxiosError } from "axios";
 import { ElMessage, ElNotification } from "element-plus";
+console.log(import.meta.env.VITE_APP_BASE, 'VITE_APP_BASE_API');
 
 const config = {
-  //baseURL: import.meta.env.VITE_APP_BASE_API,
+  baseURL: import.meta.env.VITE_APP_BASE,
   timeout: 10000,
   withCredentials: true,
   headers: {
@@ -44,8 +45,12 @@ const config = {
   },
 };
 
+
+
+
 const getBaseUrl = (env: string | undefined) => {
-  return "/api";
+  // return "/api";
+  return ''
 };
 
 interface IParam {
@@ -61,6 +66,9 @@ class RequestHttp {
   public constructor(config: any) {
     this.instance = axios.create(config);
 
+    this.instance.defaults.validateStatus = function () {
+      return true
+    }
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config: any) => {

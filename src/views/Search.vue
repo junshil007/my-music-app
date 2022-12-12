@@ -6,52 +6,51 @@
  * @LastEditTime: 2022-12-06
 -->
 <script setup lang="ts">
-import { onMounted, reactive } from "vue";
-import { search, searchHot } from "@/api/index";
-import { formatTopSongs, Song } from "@/utils/song";
-import MusicList from "@/components/MusicList.vue";
-import type { ISong } from "@/stores/song";
-import { useSongStore } from "@/stores/song";
-import { storeToRefs } from "pinia";
+  import { onMounted, reactive } from "vue";
+  import { search, searchHot } from "@/api/home";
+  import { formatTopSongs, Song } from "@/utils/song";
+  import MusicList from "@/components/MusicList.vue";
+  import type { ISong } from "@/stores/song";
+  import { useSongStore } from "@/stores/song";
+  import { storeToRefs } from "pinia";
 
-const state = reactive({
-  Artists: [] as { first: string }[], // 热搜数组
-  list: [] as ISong[], // 搜索数组
-  searchValue: "", // 搜索关键词
-  page: 0, // 分页
-  limit: 30, // 默认查询长度
-});
-
-const { loading, songList } = storeToRefs(useSongStore());
-
-const clickHot = (name: string) => {
-  state.searchValue = name;
-  onEnter();
-};
-
-const { getSearchList, onChangeSongType } = useSongStore();
-
-
-// 搜索事件
-const onEnter = async () => {
-  if (state.searchValue.replace(/(^\s+)|(\s+$)/g, "") === "") {
-    console.log("搜索内容不能为空！");
-    return;
-  }
-  state.page = 0;
-  return getSearchList({
-    offset: 0,
-    limit: 30,
-    keywords: state.searchValue,
+  const state = reactive({
+    Artists: [] as { first: string }[], // 热搜数组
+    list: [] as ISong[], // 搜索数组
+    searchValue: "", // 搜索关键词
+    page: 0, // 分页
+    limit: 30, // 默认查询长度
   });
-};
 
-onMounted(() => {
-  searchHot().then(({ result }) => {
-    state.Artists = result.hots.slice(0, 5);
+  const { loading, songList } = storeToRefs(useSongStore());
+
+  const clickHot = (name: string) => {
+    state.searchValue = name;
+    onEnter();
+  };
+
+  const { getSearchList, onChangeSongType } = useSongStore();
+
+  // 搜索事件
+  const onEnter = async () => {
+    if (state.searchValue.replace(/(^\s+)|(\s+$)/g, "") === "") {
+      console.log("搜索内容不能为空！");
+      return;
+    }
+    state.page = 0;
+    return getSearchList({
+      offset: 0,
+      limit: 30,
+      keywords: state.searchValue,
+    });
+  };
+
+  onMounted(() => {
+    searchHot().then(({ result }) => {
+      state.Artists = result.hots.slice(0, 5);
+    });
+    onChangeSongType("search");
   });
-  onChangeSongType('search')
-});
 </script>
 
 <template>

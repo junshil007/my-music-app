@@ -8,7 +8,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { reactive, watch } from "vue";
 import { useSongStore } from "./song";
-import { GetLiricInfo } from "@/api";
+import { GetLiricInfo } from "@/api/home";
 
 interface ILyricInfo {
   lyric: string;

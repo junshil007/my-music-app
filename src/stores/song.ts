@@ -3,13 +3,13 @@
  * @Author: junshi junshi@ssc-hn.com
  * @Date: 2022-10-18
  * @LastEditors: junshi junshi@ssc-hn.com
- * @LastEditTime: 2022-12-09
+ * @LastEditTime: 2022-12-12
  */
 import { ref, reactive, computed, watch } from "vue";
 import { defineStore } from "pinia";
-import { getPlayListDetail } from "@/api/index";
+import { getPlayListDetail } from "@/api/home";
 import { formatTopSongs, Song } from "@/utils/song";
-import { search } from "@/api/index";
+import { search } from "@/api/home";
 
 export interface ISong {
   /** 歌曲id */

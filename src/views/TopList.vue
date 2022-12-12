@@ -6,28 +6,28 @@
  * @LastEditTime: 2022-10-31
 -->
 <script setup lang="ts">
-import { onMounted, reactive } from "vue";
-import { getTopListDetail, getPersonalized } from "@/api";
+  import { onMounted, reactive } from "vue";
+  import { getTopListDetail, getPersonalized } from "@/api/home";
 
-interface IPorps {
-  list?: any[];
-  hotList?: any[];
-}
+  interface IPorps {
+    list?: any[];
+    hotList?: any[];
+  }
 
-const state = reactive<IPorps>({
-  list: [], // 云音乐特色榜
-  hotList: [], // 热门歌单
-});
+  const state = reactive<IPorps>({
+    list: [], // 云音乐特色榜
+    hotList: [], // 热门歌单
+  });
 
-onMounted(async () => {
-  // 推荐歌曲
-  Promise.all([getTopListDetail(), getPersonalized()])
-    .then(([topList, hotList]) => {
-      state.list = topList.list.filter((v: any) => v.ToplistType);
-      state.hotList = hotList.result.slice();
-    })
-    .catch(() => {});
-});
+  onMounted(async () => {
+    // 推荐歌曲
+    Promise.all([getTopListDetail(), getPersonalized()])
+      .then(([topList, hotList]) => {
+        state.list = topList.list.filter((v: any) => v.ToplistType);
+        state.hotList = hotList.result.slice();
+      })
+      .catch(() => {});
+  });
 </script>
 
 <template>
@@ -40,7 +40,11 @@ onMounted(async () => {
         class="list-item"
         :title="`${item.name}-${item.updateFrequency}`"
       >
-        <router-link :to="{ path: `/details/${item.id}` }" tag="div" class="topList-item">
+        <router-link
+          :to="{ path: `/details/${item.id}` }"
+          tag="div"
+          class="topList-item"
+        >
           <div class="topList-img">
             <img :src="`${item.coverImgUrl}?param=300y300`" class="cover-img" />
           </div>
@@ -51,8 +55,17 @@ onMounted(async () => {
 
     <div class="topList-head">热门歌单</div>
     <div class="topList-content hotList">
-      <div v-for="(item, index) in state.hotList" :key="index" class="list-item" :title="item.name">
-        <router-link :to="{ path: `/details/${item.id}` }" tag="div" class="topList-item">
+      <div
+        v-for="(item, index) in state.hotList"
+        :key="index"
+        class="list-item"
+        :title="item.name"
+      >
+        <router-link
+          :to="{ path: `/details/${item.id}` }"
+          tag="div"
+          class="topList-item"
+        >
           <div class="topList-img">
             <img :src="`${item.picUrl}?param=300y300`" class="cover-img" />
           </div>
